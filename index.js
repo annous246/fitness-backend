@@ -14,6 +14,7 @@ const signupLimiter = rateLimit({
   message: "Too many Requests, please try again later",
 });
 const AuthRouter = require("./Authentication_service/auth");
+const StarterRouter = require("./Starter_service/starter");
 require("dotenv").config();
 
 server.listen(process.env.PORT, () =>
@@ -27,3 +28,5 @@ app.use(cors());
 app.use(express.static("public"));
 
 app.use("/auth", AuthRouter);
+
+app.use("/starter", AuthRouter);
