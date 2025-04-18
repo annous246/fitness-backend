@@ -29,4 +29,4 @@ app.use(express.static("public"));
 
 app.use("/auth", AuthRouter);
 
-app.use("/starter", AuthRouter);
+app.use("/starter", StarterRouter);
