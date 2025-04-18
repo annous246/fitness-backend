@@ -6,4 +6,17 @@ function checker(a) {
   return true;
 }
 
-module.exports = { checker };
+function authenticate(req, res, next) {
+  const token = req.header("Authorization")?.split(" ")[1];
+  if (!token)
+    return res.json({ status: 400, ok: 0, message: "Session Expired" });
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) {
+      return res.json({ status: 400, ok: 0, message: "Session Expired" });
+    }
+    req.user = user;
+    next();
+  });
+}
+module.exports = { checker, authenticate };
