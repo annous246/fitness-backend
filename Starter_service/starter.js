@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const rateLimit = require("express-rate-limit");
-const { authenticate } = require("../utils.js");
+const { authenticate, checker } = require("../utils.js");
 
 const AuthLimiter = rateLimit({
   windowMs: 30000, //each 5 mins,
@@ -21,18 +21,14 @@ router.post(
     console.log("here");
     try {
       const { age, height, weight } = req.body.analytics;
-      console.log(req.data);
       const user = req.body.user;
-      if (!checker([age, height, weight])) {
+      if (!age || !weight || !height) {
         return res.json({
           ok: 0,
           message: "Input Error",
           status: "400",
         });
       }
-      age = parseInt(age);
-      weight = parseInt(weight);
-      height = parseInt(height);
       if (isNaN(age) || isNaN(height) || isNaN(weight)) {
         return res.json({
           ok: 0,
@@ -74,6 +70,7 @@ router.post(
         });
       }
     } catch (e) {
+      console.log(e.message);
       return res.json({
         ok: 0,
         message: "Internal Error",
