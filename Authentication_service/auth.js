@@ -4,7 +4,7 @@ const db = require("../database/db.js");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-const { checker } = require("../utils");
+const { checker, authenticate } = require("../utils");
 
 const rateLimit = require("express-rate-limit");
 
@@ -163,24 +163,17 @@ router.post("/sign-in", AuthLimiter, async (req, res) => {
     ok: 1,
     data: {
       token: token,
-      user: { id: user.id, email: user.email, username: user.username },
+      user: {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        height: user.height,
+        age: user.age,
+        weight: user.weight,
+      },
     },
     message: "Logged In Successfully",
   });
 });
-
-function authenticate(req, res, next) {
-  const token = req.header("Authorization")?.split(" ")[1];
-  if (!token)
-    return res.json({ status: 400, ok: 0, message: "Session Expired" });
-
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-    if (err) {
-      return res.json({ status: 400, ok: 0, message: "Session Expired" });
-    }
-    req.user = user;
-    next();
-  });
-}
 
 module.exports = router;

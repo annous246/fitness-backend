@@ -55,8 +55,8 @@ router.post(
       }
       //all good
       const result = await db.query(
-        "UPDATE users SET age=$3,weight=$2,height=$1 WHERE email=$4;",
-        [height, weight, age, user.email]
+        "UPDATE users SET age=$3,weight=$2,height=$1,stepper=$5 WHERE email=$4;",
+        [height, weight, age, user.email, false]
       );
       if (result.rowCount > 0) {
         //success
