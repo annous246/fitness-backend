@@ -20,7 +20,8 @@ router.post(
   async (req, res) => {
     console.log("here");
     try {
-      const { age, height, weight } = req.analytics;
+      const { age, height, weight } = req.data.analytics;
+      console.log(req.data);
       const user = req.user;
       if (!checker([age, height, weight])) {
         return res.json({
