@@ -163,14 +163,7 @@ router.post("/sign-in", AuthLimiter, async (req, res) => {
     ok: 1,
     data: {
       token: token,
-      user: {
-        id: user.id,
-        email: user.email,
-        username: user.username,
-        height: user.height,
-        age: user.age,
-        weight: user.weight,
-      },
+      user: { ...user },
     },
     message: "Logged In Successfully",
   });
