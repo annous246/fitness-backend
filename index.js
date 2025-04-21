@@ -7,6 +7,7 @@ const socketBuilder = require("socket.io");
 const server = http.createServer(app);
 const io = socketBuilder(server);
 const rateLimit = require("express-rate-limit");
+require("dotenv").config();
 
 const signupLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -15,7 +16,7 @@ const signupLimiter = rateLimit({
 });
 const AuthRouter = require("./Authentication_service/auth");
 const StarterRouter = require("./Starter_service/starter");
-require("dotenv").config();
+const foodRouter = require("./FoodService/FoodService");
 
 server.listen(process.env.PORT, () =>
   console.log(`listening on port ${process.env.PORT}`)
@@ -30,3 +31,5 @@ app.use(express.static("public"));
 app.use("/auth", AuthRouter);
 
 app.use("/starter", StarterRouter);
+
+app.use("/foods", foodRouter);

@@ -5,7 +5,12 @@ function checker(a) {
   }
   return true;
 }
-
+function numberChecker(a) {
+  for (let o of a) {
+    if (isNaN(parseInt(o))) return false;
+  }
+  return true;
+}
 function authenticate(req, res, next) {
   const token = req.header("Authorization")?.split(" ")[1];
   if (!token)
@@ -19,4 +24,4 @@ function authenticate(req, res, next) {
     next();
   });
 }
-module.exports = { checker, authenticate };
+module.exports = { checker, authenticate, numberChecker };
