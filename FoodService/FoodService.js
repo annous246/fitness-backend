@@ -14,11 +14,11 @@ const FoodAddLimiter = rateLimiter({
 });
 //add
 
-router.post("/create", async (req, res) => {
+router.post("/create", authenticate, async (req, res) => {
   try {
     console.log("food create");
     const { kcal, protein, carbs, name, portion } = req.body;
-    const id = req.body.userId; /*req.user.id*/
+    const id = req.user.id;
     if (
       !checker([name]) ||
       !numberChecker([kcal, protein, carbs, portion]) ||
@@ -61,7 +61,40 @@ router.post("/create", async (req, res) => {
   }
 });
 
-router.get("/read", async (req, res) => {});
+router.get("/read", authenticate, async (req, res) => {
+  try {
+    console.log("food get");
+
+    const id = req.user.id;
+    console.log(id);
+    const result = await db.query("SELECT * FROM foods WHERE userId=$1", [id]);
+    ///console.log(result.rows.length);
+    if (result.rowCount > 0) {
+      //all good
+      console.log(result);
+
+      return res.json({
+        status: 201,
+        ok: 1,
+        data: result.rows,
+        message: `food Successfully Pulled`,
+      });
+    } else {
+      return res.json({
+        status: 500,
+        ok: 1,
+        message: "Internal Error",
+      });
+    }
+  } catch (e) {
+    console.log(e.message + " " + e.stack);
+    return res.json({
+      status: 500,
+      ok: 0,
+      message: "Server Error",
+    });
+  }
+});
 router.get("/delete", async (req, res) => {});
 router.get("/update", async (req, res) => {});
 module.exports = router;
