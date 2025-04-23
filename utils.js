@@ -1,3 +1,4 @@
+const jwt = require("jsonwebtoken");
 function checker(a) {
   if (!a || !a.length) return false;
   for (const el of a) {
