@@ -34,7 +34,7 @@ router.post("/create", authenticate, async (req, res) => {
       });
     }
     const result = await db.query(
-      "INSERT INTO foods (kcal,protein,carbs,name,userid,portion) VALUES($1,$2,$3,$4,$5,$6);",
+      "INSERT INTO foods (calories,protein,carbs,name,userid,portion) VALUES($1,$2,$3,$4,$5,$6);",
       [kcal, protein, carbs, name, id, portion]
     );
     if (result.rowCount > 0) {
