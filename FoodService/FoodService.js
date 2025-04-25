@@ -14,6 +14,8 @@ const FoodAddLimiter = rateLimiter({
 });
 //add
 
+const updateRouter = require("./UpdateFoodMicroservice/UpdateFoodMicroservice.js");
+router.use("/update", updateRouter);
 router.post("/create", authenticate, async (req, res) => {
   try {
     console.log("food create");
