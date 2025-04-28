@@ -22,7 +22,7 @@ router.post("/update_calories", authenticate, async (req, res) => {
 
       return res.json({
         status: 201,
-        ok: 0,
+        ok: 1,
         message: "Calories Successfully updated",
       });
     } else {
@@ -54,7 +54,7 @@ router.post("/update_protein", authenticate, async (req, res) => {
 
       return res.json({
         status: 201,
-        ok: 0,
+        ok: 1,
         message: "Protein Successfully updated",
       });
     } else {
@@ -86,7 +86,7 @@ router.post("/update_carbs", authenticate, async (req, res) => {
 
       return res.json({
         status: 201,
-        ok: 0,
+        ok: 1,
         message: "carbs Successfully updated",
       });
     } else {
@@ -118,7 +118,7 @@ router.post("/update_portion", authenticate, async (req, res) => {
 
       return res.json({
         status: 201,
-        ok: 0,
+        ok: 1,
         message: "portion Successfully updated",
       });
     } else {
