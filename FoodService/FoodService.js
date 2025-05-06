@@ -84,7 +84,7 @@ router.get("/read", authenticate, async (req, res) => {
     } else {
       return res.json({
         status: 500,
-        ok: 1,
+        ok: 0,
         message: "Internal Error",
       });
     }
