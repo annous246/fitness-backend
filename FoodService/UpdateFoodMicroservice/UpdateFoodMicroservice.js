@@ -11,7 +11,12 @@ router.post("/update_calories", authenticate, async (req, res) => {
   const { id, calories } = req.body;
   console.log(id);
   console.log(calories);
-  if (calories && numberChecker([calories]) && id && calories > -1) {
+  if (
+    calories != undefined &&
+    numberChecker([calories]) &&
+    id &&
+    calories > -1
+  ) {
     const result = await db.query("UPDATE foods SET calories=$1 WHERE id=$2", [
       calories,
       id,
@@ -43,7 +48,7 @@ router.post("/update_calories", authenticate, async (req, res) => {
 
 router.post("/update_protein", authenticate, async (req, res) => {
   const { id, protein } = req.body;
-  if (protein && numberChecker([protein]) && id && protein > -1) {
+  if (protein != undefined && numberChecker([protein]) && id && protein > -1) {
     const result = await db.query("UPDATE foods SET protein=$1 WHERE id=$2", [
       protein,
       id,
@@ -75,7 +80,7 @@ router.post("/update_protein", authenticate, async (req, res) => {
 
 router.post("/update_carbs", authenticate, async (req, res) => {
   const { id, carbs } = req.body;
-  if (carbs && numberChecker([carbs]) && id && carbs > -1) {
+  if (carbs != undefined && numberChecker([carbs]) && id && carbs > -1) {
     const result = await db.query("UPDATE foods SET carbs=$1 WHERE id=$2", [
       carbs,
       id,
@@ -107,7 +112,7 @@ router.post("/update_carbs", authenticate, async (req, res) => {
 
 router.post("/update_portion", authenticate, async (req, res) => {
   const { id, portion } = req.body;
-  if (portion && numberChecker([portion]) && id && portion > -1) {
+  if (portion != undefined && numberChecker([portion]) && id && portion > -1) {
     const result = await db.query("UPDATE foods SET portion=$1 WHERE id=$2", [
       portion,
       id,

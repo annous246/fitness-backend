@@ -17,7 +17,7 @@ const signupLimiter = rateLimit({
 const AuthRouter = require("./Authentication_service/auth");
 const StarterRouter = require("./Starter_service/starter");
 const foodRouter = require("./FoodService/FoodService");
-
+const macroRouter = require("./MacroService/MacrosService");
 server.listen(process.env.PORT, () =>
   console.log(`listening on port ${process.env.PORT}`)
 );
@@ -33,3 +33,5 @@ app.use("/auth", AuthRouter);
 app.use("/starter", StarterRouter);
 
 app.use("/foods", foodRouter);
+
+app.use("/macros", macroRouter);
