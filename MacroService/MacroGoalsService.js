@@ -85,7 +85,7 @@ router.post("/update_calories_goal", authenticate, async (req, res) => {
       }
       return res.json({
         status: 500,
-        ok: 1,
+        ok: 0,
         message: "Internal Error",
       });
     } else {
@@ -142,7 +142,7 @@ router.post("/update_protein_goal", authenticate, async (req, res) => {
       }
       return res.json({
         status: 500,
-        ok: 1,
+        ok: 0,
         message: "Internal Error",
       });
     } else {
@@ -197,7 +197,7 @@ router.post("/update_carbs_goal", authenticate, async (req, res) => {
       }
       return res.json({
         status: 500,
-        ok: 1,
+        ok: 0,
         message: "Internal Error",
       });
     } else {
