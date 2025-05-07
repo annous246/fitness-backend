@@ -62,7 +62,7 @@ router.post("/update_progress", authenticate, async (req, res) => {
       protein > -1
     ) {
       const result = await db.query(
-        "UPDATE users SET calories_progress=$1,carbs_progress=$3,protein_progress=$4 WHERE id=$2",
+        "UPDATE users SET calories_progress=calories_progress+$1,carbs_progress=carbs_progress+$3,protein_progress=protein_progress+$4 WHERE id=$2",
         [calories, id, carbs, protein]
       );
       if (result.rowCount > 0) {
