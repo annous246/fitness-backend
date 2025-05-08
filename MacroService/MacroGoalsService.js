@@ -11,10 +11,9 @@ router.get("/read", authenticate, async (req, res) => {
   try {
     const id = req.user.id;
     console.log(id);
-    const result = await db.query(
-      "SELECT * FROM macro_goals WHERE user_id=$1",
-      [id]
-    );
+    const result = await db.query("SELECT * FROM macro_goals WHERE userid=$1", [
+      id,
+    ]);
     ///console.log(result.rows.length);
     if (result.rowCount > 0) {
       //all good
@@ -54,11 +53,11 @@ router.post("/update_calories_goal", authenticate, async (req, res) => {
     calories > -1
   ) {
     const result = await db.query(
-      "UPDATE macro_goals SET calories_goal=$1 WHERE user_id=$2",
+      "UPDATE macro_goals SET calories_goal=$1 WHERE userid=$2",
       [calories, id]
     );
     const exists = await db.query(
-      "SELECT * FROM macro_goals WHERE user_id=$1 ",
+      "SELECT * FROM macro_goals WHERE userid=$1 ",
       [id]
     );
     if (result.rowCount > 0) {
@@ -71,7 +70,7 @@ router.post("/update_calories_goal", authenticate, async (req, res) => {
       });
     } else if (exists.rowCount == 0) {
       const result = await db.query(
-        "INSERT INTO macro_goals (calories_goal,user_id) VALUES($1,$2)",
+        "INSERT INTO macro_goals (calories_goal,userid) VALUES($1,$2)",
         [calories, id]
       );
       if (result.rowCount > 0) {
@@ -109,11 +108,11 @@ router.post("/update_protein_goal", authenticate, async (req, res) => {
   const id = req.user.id;
   if (protein != undefined && numberChecker([protein]) && id && protein > -1) {
     const exists = await db.query(
-      "SELECT * FROM macro_goals WHERE user_id=$1 ",
+      "SELECT * FROM macro_goals WHERE userid=$1 ",
       [id]
     );
     const result = await db.query(
-      "UPDATE macro_goals SET protein_goal=$1 WHERE user_id=$2",
+      "UPDATE macro_goals SET protein_goal=$1 WHERE userid=$2",
       [protein, id]
     );
     console.log(protein);
@@ -128,7 +127,7 @@ router.post("/update_protein_goal", authenticate, async (req, res) => {
       });
     } else if (exists.rowCount == 0) {
       const result = await db.query(
-        "INSERT INTO macro_goals (protein_goal,user_id) VALUES($1,$2)",
+        "INSERT INTO macro_goals (protein_goal,userid) VALUES($1,$2)",
         [protein, id]
       );
       if (result.rowCount > 0) {
@@ -166,11 +165,11 @@ router.post("/update_carbs_goal", authenticate, async (req, res) => {
   const id = req.user.id;
   if (carbs != undefined && numberChecker([carbs]) && id && carbs > -1) {
     const result = await db.query(
-      "UPDATE macro_goals SET carbs_goal=$1 WHERE user_id=$2",
+      "UPDATE macro_goals SET carbs_goal=$1 WHERE userid=$2",
       [carbs, id]
     );
     const exists = await db.query(
-      "SELECT * FROM macro_goals WHERE user_id=$1 ",
+      "SELECT * FROM macro_goals WHERE userid=$1 ",
       [id]
     );
     if (result.rowCount > 0) {
@@ -183,7 +182,7 @@ router.post("/update_carbs_goal", authenticate, async (req, res) => {
       });
     } else if (exists.rowCount == 0) {
       const result = await db.query(
-        "INSERT INTO macro_goals (carbs_goal,user_id) VALUES($1,$2)",
+        "INSERT INTO macro_goals (carbs_goal,userid) VALUES($1,$2)",
         [carbs, id]
       );
       if (result.rowCount > 0) {
