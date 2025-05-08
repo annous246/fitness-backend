@@ -6,7 +6,41 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const { authenticate, numberChecker, checker } = require("../utils.js");
-
+router.post("/reset", authenticate, async (req, res) => {
+  try {
+    const id = req.user.id;
+    console.log(id);
+    const result = await db.query(
+      "UPDATE  users SET calories_progress=0.0 ,protein_progress=0.0,carbs_progress=0.0 WHERE id=$1",
+      [id]
+    );
+    ///console.log(result.rows.length);
+    if (result.rowCount > 0) {
+      //all good
+      console.log(result);
+      console.log(result.rows[0]);
+      return res.json({
+        status: 201,
+        ok: 1,
+        data: {},
+        message: `progress Successfully Reset`,
+      });
+    } else {
+      return res.json({
+        status: 500,
+        ok: 0,
+        message: "Internal Error",
+      });
+    }
+  } catch (e) {
+    console.log(e.message + " " + e.stack);
+    return res.json({
+      status: 500,
+      ok: 0,
+      message: "Server Error",
+    });
+  }
+});
 router.get("/read", authenticate, async (req, res) => {
   try {
     const id = req.user.id;

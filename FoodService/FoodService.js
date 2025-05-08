@@ -15,7 +15,9 @@ const FoodAddLimiter = rateLimiter({
 //add
 
 const updateRouter = require("./UpdateFoodMicroservice/UpdateFoodMicroservice.js");
+const consumedRouter = require("./UpdateConsumedFoodMicroservice/UpdateConsumedFoodMicroservice.js");
 router.use("/update", updateRouter);
+router.use("/consumed", consumedRouter);
 router.post("/create", authenticate, async (req, res) => {
   try {
     console.log("food create");
@@ -69,16 +71,20 @@ router.get("/read", authenticate, async (req, res) => {
 
     const id = req.user.id;
     console.log(id);
-    const result = await db.query("SELECT * FROM foods WHERE userId=$1", [id]);
+    const resultNotConsumed = await db.query(
+      "SELECT * FROM foods WHERE userid=$1 AND id NOT IN (SELECT id FROM consumed_foods WHERE userid=$1) ;",
+      [id]
+    );
     ///console.log(result.rows.length);
-    if (result.rowCount > 0) {
+    if (resultNotConsumed.rowCount > 0) {
       //all good
-      console.log(result);
+
+      // filter
 
       return res.json({
         status: 201,
         ok: 1,
-        data: result.rows,
+        data: resultNotConsumed.rows,
         message: `food Successfully Pulled`,
       });
     } else {
