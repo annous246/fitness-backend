@@ -89,4 +89,37 @@ router.post("/reset", authenticate, async (req, res) => {
     });
   }
 });
+
+router.get("/read", authenticate, async (req, res) => {
+  const id = req.user.id;
+  if (id) {
+    const result = await db.query(
+      "SELECT * FROM consumed_foods WHERE userid=$1",
+      [id]
+    );
+
+    if (result.rowCount > 0) {
+      //all good
+      return res.json({
+        status: 201,
+        ok: 1,
+        data: result.rows,
+        message: "Consumed foods pulled",
+      });
+    } else {
+      return res.json({
+        status: 500,
+        ok: 0,
+        message: "Internal Error",
+      });
+    }
+  } else {
+    return res.json({
+      status: 400,
+      ok: 0,
+      message: "Input Missing / Error",
+    });
+  }
+});
+
 module.exports = router;
