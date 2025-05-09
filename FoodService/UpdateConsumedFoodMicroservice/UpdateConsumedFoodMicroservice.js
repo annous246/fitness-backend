@@ -65,22 +65,14 @@ router.post("/reset", authenticate, async (req, res) => {
       "DELETE  FROM consumed_foods WHERE userid=$1",
       [id]
     );
+    console.log(result);
+    //all good
 
-    if (result.rowCount > 0) {
-      //all good
-
-      return res.json({
-        status: 201,
-        ok: 1,
-        message: "Consumed foods Successfully reset",
-      });
-    } else {
-      return res.json({
-        status: 500,
-        ok: 0,
-        message: "Internal Error",
-      });
-    }
+    return res.json({
+      status: 201,
+      ok: 1,
+      message: "Consumed foods Successfully reset",
+    });
   } else {
     return res.json({
       status: 400,

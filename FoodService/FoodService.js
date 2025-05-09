@@ -103,6 +103,49 @@ router.get("/read", authenticate, async (req, res) => {
     });
   }
 });
-router.get("/delete", async (req, res) => {});
+router.post("/delete", authenticate, async (req, res) => {
+  try {
+    console.log("food delete");
+
+    const id = req.user.id;
+    const { foodId } = req.body;
+    const result = await db.query(
+      "DELETE  FROM consumed_foods WHERE userid=$1 AND id=$2 ;",
+      [id, foodId]
+    );
+    const resultNotConsumed = await db.query(
+      "DELETE  FROM foods WHERE userid=$1 AND id=$2 ;",
+      [id, foodId]
+    );
+    ///console.log(result.rows.length);
+    console.log(resultNotConsumed.rowCount);
+    console.log(result.rowCount);
+    if (resultNotConsumed.rowCount > 0 || result.rowCount > 0) {
+      //all good
+
+      // filter
+
+      return res.json({
+        status: 201,
+        ok: 1,
+        data: resultNotConsumed.rows,
+        message: `food Successfully deleted`,
+      });
+    } else {
+      return res.json({
+        status: 500,
+        ok: 0,
+        message: "Internal Error",
+      });
+    }
+  } catch (e) {
+    console.log(e.message + " " + e.stack);
+    return res.json({
+      status: 500,
+      ok: 0,
+      message: "Server Error",
+    });
+  }
+});
 router.get("/update", async (req, res) => {});
 module.exports = router;
