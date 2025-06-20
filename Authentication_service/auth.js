@@ -171,7 +171,7 @@ router.post("/sign-in", AuthLimiter, async (req, res) => {
         age: user.age,
         weight: user.weight,
         stepper: user.stepper,
-        userLastReset: new Date(user.last_reset),
+        userLastReset: JSON.stringify(new Date(user.last_reset)),
       },
     },
     message: "Logged In Successfully",
