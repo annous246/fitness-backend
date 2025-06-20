@@ -87,17 +87,17 @@ router.post("/sign-up", AuthLimiter, async (req, res) => {
     //good to go
 
     const hashedPassword = await bcrypt.hash(password, 10);
-
+    const initialreset = new Date();
     const insertionResult = await db.query(
-      `INSERT INTO users (username,email,password) VALUES ($1,$2,$3)`,
-      [username, email, hashedPassword]
+      `INSERT INTO users (username,email,password,last_reset) VALUES ($1,$2,$3,$4)`,
+      [username, email, hashedPassword, initialreset.toISOString()]
     );
     console.log(req.body);
     if (insertionResult.rowCount > 0) {
       console.log("done");
       return res.json({
         ok: 1,
-        message: "Success ",
+        message: "Registered Up Successfully",
         status: "200",
       });
     } else {
@@ -171,6 +171,7 @@ router.post("/sign-in", AuthLimiter, async (req, res) => {
         age: user.age,
         weight: user.weight,
         stepper: user.stepper,
+        userLastReset: new Date(user.last_reset),
       },
     },
     message: "Logged In Successfully",
