@@ -11,8 +11,8 @@ router.post("/reset", authenticate, async (req, res) => {
     const id = req.user.id;
     console.log(id);
     const result = await db.query(
-      "UPDATE  users SET calories_progress=0.0 ,protein_progress=0.0,carbs_progress=0.0 WHERE id=$1",
-      [id]
+      "UPDATE  users SET calories_progress=0.0 ,protein_progress=0.0,carbs_progress=0.0,last_reset=$2 WHERE id=$1",
+      [id, new Date().toISOString()]
     );
     ///console.log(result.rows.length);
     if (result.rowCount > 0) {
