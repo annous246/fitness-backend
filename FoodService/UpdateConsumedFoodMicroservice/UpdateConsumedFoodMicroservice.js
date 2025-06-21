@@ -59,26 +59,56 @@ router.post("/add", authenticate, async (req, res) => {
 });
 
 router.post("/reset", authenticate, async (req, res) => {
-  const id = req.user.id;
-  if (id) {
-    const result = await db.query(
-      "DELETE  FROM consumed_foods WHERE userid=$1",
-      [id]
-    );
-    console.log(result);
-    //all good
+  try {
+    const id = req.user.id;
+    if (id) {
+      const pastDate = new Date(JSON.parse(req.body.PastDate));
+      const dateOnly = pastDate.toISOString().split("T")[0];
+      const consumedfoodsResults = await db.query(
+        "SELECT * FROM consumed_foods WHERE userid=$1",
+        [id]
+      );
+      await db.query("BEGIN");
 
-    return res.json({
-      status: 201,
-      ok: 1,
-      message: "Consumed foods Successfully reset",
-    });
-  } else {
-    return res.json({
-      status: 400,
-      ok: 0,
-      message: "Input Missing / Error",
-    });
+      for (const row of consumedfoodsResults.rows) {
+        console.log("row");
+        console.log(row);
+        await db.query(
+          "INSERT INTO past_consumed_foods(name,protein,carbs,calories,portion,servings,userid,consumed_date) VALUES($1,$2,$3,$4,$5,$6,$7,$8)",
+          [
+            row.name,
+            row.protein,
+            row.carbs,
+            row.calories,
+            row.portion,
+            row.servings,
+            row.userid,
+            dateOnly,
+          ]
+        );
+      }
+      const result = await db.query(
+        "DELETE  FROM consumed_foods WHERE userid=$1",
+        [id]
+      );
+      console.log(result);
+      //all good
+      await db.query("COMMIT");
+      return res.json({
+        status: 201,
+        ok: 1,
+        message: "Consumed foods Successfully reset",
+      });
+    } else {
+      return res.json({
+        status: 400,
+        ok: 0,
+        message: "Input Missing / Error",
+      });
+    }
+  } catch (e) {
+    await db.query("ROLLBACK");
+    console.log(e.message + " " + e.stack);
   }
 });
 
@@ -111,6 +141,50 @@ router.get("/read", authenticate, async (req, res) => {
       ok: 0,
       message: "Input Missing / Error",
     });
+  }
+});
+
+router.get("/readPast", authenticate, async (req, res) => {
+  try {
+    const id = req.user.id;
+    const day = req.body.day;
+    const month = req.body.month;
+    const year = req.body.year;
+    if (!numberChecker([day, month, year]))
+      return res.json({
+        status: 400,
+        ok: 0,
+        message: "Input Error",
+      });
+    let date = `${year}-`;
+    date += month < 10 ? "0" + month.toString() : month.toString();
+    date += "-";
+    date += day < 10 ? "0" + day.toString() : day.toString();
+    console.log("date");
+    if (id) {
+      const result = await db.query(
+        "SELECT * FROM past_consumed_foods WHERE userid=$1 AND consumed_date=$2",
+        [id, date]
+      );
+
+      if (result.rowCount >= 0) {
+        //all good
+        return res.json({
+          status: 201,
+          ok: 1,
+          data: result.rows,
+          message: "Past Consumed foods pulled",
+        });
+      }
+    } else {
+      return res.json({
+        status: 400,
+        ok: 0,
+        message: "Input Missing / Error",
+      });
+    }
+  } catch (e) {
+    console.log(e.message + " " + e.stack);
   }
 });
 
