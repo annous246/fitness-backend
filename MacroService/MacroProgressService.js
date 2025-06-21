@@ -74,9 +74,9 @@ router.post("/reset", authenticate, async (req, res) => {
 router.get("/readPast", authenticate, async (req, res) => {
   try {
     const id = req.user.id;
-    const day = req.body.day;
-    const month = req.body.month;
-    const year = req.body.year;
+    const day = req.query.day;
+    const month = req.query.month;
+    const year = req.query.year;
     if (!numberChecker([day, month, year]))
       return res.json({
         status: 400,
