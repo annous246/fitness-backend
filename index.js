@@ -29,7 +29,14 @@ app.use(bp.json());
 
 app.use(cors());
 app.use(express.static("public"));
-
+const fl = async () => {
+  const { runAi } = await import("./AI_service/Ai_image_servicem.mjs");
+  const res = await runAi(
+    "https://www.foodiesfeed.com/wp-content/uploads/2023/06/burger-with-melted-cheese.jpg"
+  );
+  console.log(res);
+};
+fl();
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/auth", AuthRouter);
 

@@ -22,7 +22,7 @@ export async function runAi(url) {
           content: [
             {
               type: "text",
-              text: "Please identify this food (in a max of 15 to 20 caracters) and provide nutritional macros in JSON format: {name:'', protein:'', carbs:'', calories:''}.",
+              text: "Please identify this food (in a max of 15 to 20 caracters) and provide nutritional macros in JSON format: {name:'', protein:'', carbs:'', calories:''}.(only response with the json object ONLY!)",
             },
             {
               type: "image_url",
