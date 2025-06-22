@@ -3,6 +3,20 @@ const router = express.Router();
 const db = require("../database/db.js");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/"); // make sure this folder exists
+  },
+  filename: (req, file, cb) => {
+    const uniqueName = Date.now() + "-" + file.originalname;
+    cb(null, uniqueName);
+  },
+});
+const upload = multer({ storage });
 
 const rateLimiter = require("express-rate-limit");
 const { authenticate, numberChecker, checker } = require("../utils.js");
@@ -148,4 +162,33 @@ router.post("/delete", authenticate, async (req, res) => {
   }
 });
 router.get("/update", async (req, res) => {});
+
+router.post(
+  "/upload",
+  authenticate,
+  upload.single("image"),
+  async (req, res) => {
+    if (!req.file) return res.status(400).send("No image uploaded.");
+
+    const imageUrl = `${req.protocol}://${req.get("host")}/uploads/${
+      req.file.filename
+    }`;
+
+    try {
+      const { runAi } = await import("../AI_service/Ai_image_servicem.mjs");
+      const result = await runAi(imageUrl);
+      console.log(imageUrl);
+      console.log(result);
+      // Clean up image after processing
+
+      return res.json({ data: result, ok: 1, message: "Image Detected" });
+    } catch (err) {
+      console.error("AI Error:", err);
+      return res.json({ ok: 0, message: "error uploading image" });
+    } finally {
+      fs.unlinkSync(req.file.path);
+      console.log("image deleted");
+    }
+  }
+);
 module.exports = router;

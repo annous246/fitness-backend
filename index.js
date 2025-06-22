@@ -3,6 +3,7 @@ app = express();
 const bp = require("body-parser");
 const cors = require("cors");
 const http = require("http");
+const path = require("path");
 const socketBuilder = require("socket.io");
 const server = http.createServer(app);
 const io = socketBuilder(server);
@@ -29,6 +30,7 @@ app.use(bp.json());
 app.use(cors());
 app.use(express.static("public"));
 
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/auth", AuthRouter);
 
 app.use("/starter", StarterRouter);
