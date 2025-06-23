@@ -10,6 +10,7 @@ export async function runAi(url) {
   console.log("hi");
   const client = ModelClient(endpoint, new AzureKeyCredential(token));
 
+  console.log("hi");
   const response = await client.path("/chat/completions").post({
     body: {
       messages: [
@@ -39,6 +40,7 @@ export async function runAi(url) {
     },
   });
 
+  console.log("hi");
   if (isUnexpected(response)) {
     throw response.body.error;
   }
