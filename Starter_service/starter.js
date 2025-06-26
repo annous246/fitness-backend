@@ -16,7 +16,7 @@ const AuthLimiter = rateLimit({
 router.post("/stepper_finished", AuthLimiter, async (req, res) => {
   console.log("here");
   try {
-    const { age, height, weight } = req.body.analytics;
+    const { age, height, weight, gender } = req.body.analytics;
     const user = req.body.user;
     if (!age || !weight || !height) {
       return res.json({
@@ -48,8 +48,8 @@ router.post("/stepper_finished", AuthLimiter, async (req, res) => {
     }
     //all good
     const result = await db.query(
-      "UPDATE users SET age=$3,weight=$2,height=$1,stepper=$5 WHERE email=$4;",
-      [height, weight, age, user.email, false]
+      "UPDATE users SET age=$3,weight=$2,height=$1,stepper=$5,gender=$6 WHERE email=$4;",
+      [height, weight, age, user.email, false, gender]
     );
     if (result.rowCount > 0) {
       //success

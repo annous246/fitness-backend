@@ -161,11 +161,13 @@ router.get("/readPast", authenticate, async (req, res) => {
     date += "-";
     date += day < 10 ? "0" + day.toString() : day.toString();
     console.log("date");
+    console.log(date);
     if (id) {
       const result = await db.query(
         "SELECT * FROM past_consumed_foods WHERE userid=$1 AND consumed_date=$2",
         [id, date]
       );
+      console.log(result.rows);
 
       if (result.rowCount >= 0) {
         //all good
