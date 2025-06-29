@@ -208,7 +208,7 @@ router.post("/update_progress", authenticate, async (req, res) => {
 async function pullDaily(daily, id, element) {
   try {
     const now = new Date();
-    for (let p = 0; p < 7; p++) {
+    for (let p = 1; p <= 7; p++) {
       const thatDay = new Date();
       thatDay.setDate(now.getDate() - p);
       const convertedDate = `${thatDay.getFullYear()}-${String(
@@ -231,6 +231,7 @@ async function pullWeekly(weekly, id, element) {
   try {
     console.log("thatDay");
     const now = new Date();
+    now.setDate(now.getDate() - 1);
     console.log("thatDay");
     for (let p = 0; p < 4; p++) {
       const thatDay = new Date();
@@ -268,6 +269,7 @@ async function pullWeekly(weekly, id, element) {
 async function pullMonthly(monthly, id, element) {
   try {
     const now = new Date();
+    now.setDate(now.getDate() - 1);
     for (let p = 0; p < 12; p++) {
       const thatDay = new Date();
       thatDay.setMonth(now.getMonth() - p);
@@ -290,6 +292,7 @@ async function pullMonthly(monthly, id, element) {
 async function pullYearly(yearly, id, element) {
   try {
     const now = new Date();
+    now.setDate(now.getDate() - 1);
     for (let p = 0; p < 5; p++) {
       const thatDay = new Date();
       thatDay.setYear(now.getFullYear() - p);
