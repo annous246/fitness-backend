@@ -204,4 +204,231 @@ router.post("/update_progress", authenticate, async (req, res) => {
     console.log(e.message + " " + e.stack);
   }
 });
+
+async function pullDaily(daily, id, element) {
+  try {
+    const now = new Date();
+    for (let p = 0; p < 7; p++) {
+      const thatDay = new Date();
+      thatDay.setDate(now.getDate() - p);
+      const convertedDate = `${thatDay.getFullYear()}-${String(
+        thatDay.getMonth() + 1
+      ).padStart(2, "0")}-${String(thatDay.getDate()).padStart(2, "0")}`;
+      console.log(convertedDate);
+      let result = await db.query(
+        `SELECT AVG(${element}_goal),SUM(${element}_goal) FROM past_macro_goals WHERE userid=$1 GROUP BY progress_date HAVING progress_date=$2 `,
+        [id, convertedDate]
+      );
+      console.log(result.rowCount);
+      if (result.rowCount) daily[convertedDate] = result.rows[0];
+      else daily[convertedDate] = { avg: 0, sum: 0 };
+      console.log(daily);
+    }
+  } catch (e) {}
+}
+
+async function pullWeekly(weekly, id, element) {
+  try {
+    console.log("thatDay");
+    const now = new Date();
+    console.log("thatDay");
+    for (let p = 0; p < 4; p++) {
+      const thatDay = new Date();
+      const lastDay = new Date();
+      const firstDay = new Date();
+      thatDay.setDate(now.getDate() - 7 * (p + 1));
+      firstDay.setDate(thatDay.getDate() + 1);
+      lastDay.setDate(thatDay.getDate() + 7);
+      console.log(thatDay);
+
+      const convertedLeftDate = `${firstDay.getFullYear()}-${String(
+        firstDay.getMonth() + 1
+      ).padStart(2, "0")}-${String(firstDay.getDate()).padStart(2, "0")}`;
+
+      const convertedRightDate = `${lastDay.getFullYear()}-${String(
+        lastDay.getMonth() + 1
+      ).padStart(2, "0")}-${String(lastDay.getDate()).padStart(2, "0")}`;
+      console.log(convertedLeftDate);
+      console.log(convertedRightDate);
+      let result = await db.query(
+        `SELECT AVG(${element}_goal),SUM(${element}_goal) FROM past_macro_goals WHERE userid=$1 AND progress_date BETWEEN $2 AND $3`,
+        [id, convertedLeftDate, convertedRightDate]
+      );
+      console.log(result.rowCount);
+      if (result.rowCount && result.rows[0]["avg"])
+        weekly["week" + (p + 1)] = result.rows[0];
+      else weekly["week" + (p + 1)] = { avg: 0, sum: 0 };
+      console.log(weekly);
+    }
+  } catch (e) {
+    console.log(e.message);
+  }
+}
+
+async function pullMonthly(monthly, id, element) {
+  try {
+    const now = new Date();
+    for (let p = 0; p < 12; p++) {
+      const thatDay = new Date();
+      thatDay.setMonth(now.getMonth() - p);
+      let result = await db.query(
+        `SELECT AVG(${element}_goal),SUM(${element}_goal) FROM past_macro_goals WHERE userid=$1 AND EXTRACT(MONTH FROM progress_date) = $2 AND EXTRACT(YEAR FROM progress_date) = $3 `,
+        [id, thatDay.getMonth() + 1, thatDay.getFullYear()]
+      );
+      const converted =
+        String(thatDay.getFullYear()) +
+        "-" +
+        String(thatDay.getMonth() + 1).padStart(2, "0");
+      if (result.rowCount && result.rows[0]["avg"])
+        monthly[converted] = result.rows[0];
+      else monthly[converted] = { avg: 0, sum: 0 };
+      console.log(monthly);
+    }
+  } catch (e) {}
+}
+
+async function pullYearly(yearly, id, element) {
+  try {
+    const now = new Date();
+    for (let p = 0; p < 5; p++) {
+      const thatDay = new Date();
+      thatDay.setYear(now.getFullYear() - p);
+      let result = await db.query(
+        `SELECT AVG(${element}_goal),SUM(${element}_goal) FROM past_macro_goals WHERE userid=$1 AND EXTRACT(YEAR FROM progress_date) = $2 `,
+        [id, thatDay.getFullYear()]
+      );
+      const converted = String(thatDay.getFullYear());
+      if (result.rowCount && result.rows[0]["avg"])
+        yearly[converted] = result.rows[0];
+      else yearly[converted] = { avg: 0, sum: 0 };
+      console.log(yearly);
+    }
+  } catch (e) {}
+}
+router.post("/calories_metrics", authenticate, async (req, res) => {
+  try {
+    const id = req.user.id;
+    let daily = {};
+    let monthly = {};
+    let yearly = {};
+    let weekly = {};
+    if (id) {
+      //ik average / total day isnt logic , dont rant its sjust for some testing
+      //pull average/total by week (past week)
+
+      await pullDaily(daily, id, "calories");
+      //pull average/total by week (past )
+      await pullWeekly(weekly, id, "calories");
+      //pull average/total by month (past )
+      await pullMonthly(monthly, id, "calories");
+      //pull average/total by year
+      await pullYearly(yearly, id, "calories");
+      //pull all time average/total
+
+      //all good
+      return res.json({
+        status: 201,
+        ok: 1,
+        data: {
+          monthly: monthly,
+          yearly: yearly,
+          daily: daily,
+          weekly: weekly,
+        },
+        message: "calories metrics pulled",
+      });
+    } else {
+      return res.json({
+        status: 400,
+        ok: 0,
+        message: "Input Missing / Error",
+      });
+    }
+  } catch (e) {}
+});
+
+router.post("/carbs_metrics", authenticate, async (req, res) => {
+  try {
+    const id = req.user.id;
+    let daily = {};
+    let monthly = {};
+    let yearly = {};
+    let weekly = {};
+    if (id) {
+      //ik average / total day isnt logic , dont rant its sjust for some testing
+      //pull average/total by week (past week)
+
+      await pullDaily(daily, id, "carbs");
+      //pull average/total by week (past )
+      await pullWeekly(weekly, id, "carbs");
+      //pull average/total by month (past )
+      await pullMonthly(monthly, id, "carbs");
+      //pull average/total by year
+      await pullYearly(yearly, id, "carbs");
+      //pull all time average/total
+
+      //all good
+      return res.json({
+        status: 201,
+        ok: 1,
+        data: {
+          monthly: monthly,
+          yearly: yearly,
+          daily: daily,
+          weekly: weekly,
+        },
+        message: "calories metrics pulled",
+      });
+    } else {
+      return res.json({
+        status: 400,
+        ok: 0,
+        message: "Input Missing / Error",
+      });
+    }
+  } catch (e) {}
+});
+
+router.post("/protein_metrics", authenticate, async (req, res) => {
+  try {
+    const id = req.user.id;
+    let daily = {};
+    let monthly = {};
+    let yearly = {};
+    let weekly = {};
+    if (id) {
+      //ik average / total day isnt logic , dont rant its sjust for some testing
+      //pull average/total by week (past week)
+
+      await pullDaily(daily, id, "protein");
+      //pull average/total by week (past )
+      await pullWeekly(weekly, id, "protein");
+      //pull average/total by month (past )
+      await pullMonthly(monthly, id, "protein");
+      //pull average/total by year
+      await pullYearly(yearly, id, "protein");
+      //pull all time average/total
+
+      //all good
+      return res.json({
+        status: 201,
+        ok: 1,
+        data: {
+          monthly: monthly,
+          yearly: yearly,
+          daily: daily,
+          weekly: weekly,
+        },
+        message: "calories metrics pulled",
+      });
+    } else {
+      return res.json({
+        status: 400,
+        ok: 0,
+        message: "Input Missing / Error",
+      });
+    }
+  } catch (e) {}
+});
+
 module.exports = router;
