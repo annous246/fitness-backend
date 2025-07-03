@@ -235,13 +235,14 @@ async function pullWeekly(weekly, id, element) {
     console.log("thatDay");
     for (let p = 0; p < 4; p++) {
       const thatDay = new Date();
-      const lastDay = new Date();
-      const firstDay = new Date();
       thatDay.setDate(now.getDate() - 7 * (p + 1));
+      const lastDay = new Date(thatDay);
+      const firstDay = new Date(thatDay);
       firstDay.setDate(thatDay.getDate() + 1);
       lastDay.setDate(thatDay.getDate() + 7);
       console.log(thatDay);
-
+      console.log(firstDay);
+      console.log(lastDay);
       const convertedLeftDate = `${firstDay.getFullYear()}-${String(
         firstDay.getMonth() + 1
       ).padStart(2, "0")}-${String(firstDay.getDate()).padStart(2, "0")}`;
