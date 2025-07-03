@@ -170,6 +170,7 @@ router.post("/sign-in", AuthLimiter, async (req, res) => {
         height: user.height,
         age: user.age,
         weight: user.weight,
+        gender: user.gender,
         stepper: user.stepper,
         userLastReset: JSON.stringify(new Date(user.last_reset)),
       },

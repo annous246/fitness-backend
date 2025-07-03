@@ -13,66 +13,71 @@ const AuthLimiter = rateLimit({
   message: "Too many Requests, please try again later",
 });
 
-router.post("/stepper_finished", AuthLimiter, async (req, res) => {
-  console.log("here");
-  try {
-    const { age, height, weight, gender } = req.body.analytics;
-    const user = req.body.user;
-    if (!age || !weight || !height) {
-      return res.json({
-        ok: 0,
-        message: "Input Error",
-        status: "400",
-      });
-    }
-    if (isNaN(age) || isNaN(height) || isNaN(weight)) {
-      return res.json({
-        ok: 0,
-        message: "Input Error",
-        status: "400",
-      });
-    }
-    if (
-      age > 200 ||
-      age < 0 ||
-      weight > 1000 ||
-      weight < 0 ||
-      height > 1000 ||
-      height < 0
-    ) {
-      return res.json({
-        ok: 0,
-        message: "Input Error",
-        status: "400",
-      });
-    }
-    //all good
-    const result = await db.query(
-      "UPDATE users SET age=$3,weight=$2,height=$1,stepper=$5,gender=$6 WHERE email=$4;",
-      [height, weight, age, user.email, false, gender]
-    );
-    if (result.rowCount > 0) {
-      //success
-      return res.json({
-        ok: 1,
-        message: "Steppers Done Successfully",
-        status: "200",
-      });
-    } else {
+router.post(
+  "/stepper_finished",
+  authenticate,
+  AuthLimiter,
+  async (req, res) => {
+    console.log("here");
+    try {
+      const { age, height, weight, gender } = req.body.analytics;
+      const user = req.body.user;
+      if (!age || !weight || !height) {
+        return res.json({
+          ok: 0,
+          message: "Input Error",
+          status: "400",
+        });
+      }
+      if (isNaN(age) || isNaN(height) || isNaN(weight)) {
+        return res.json({
+          ok: 0,
+          message: "Input Error",
+          status: "400",
+        });
+      }
+      if (
+        age > 200 ||
+        age < 0 ||
+        weight > 1000 ||
+        weight < 0 ||
+        height > 1000 ||
+        height < 0
+      ) {
+        return res.json({
+          ok: 0,
+          message: "Input Error",
+          status: "400",
+        });
+      }
+      //all good
+      const result = await db.query(
+        "UPDATE users SET age=$3,weight=$2,height=$1,stepper=$5,gender=$6 WHERE email=$4;",
+        [height, weight, age, user.email, false, gender]
+      );
+      if (result.rowCount > 0) {
+        //success
+        return res.json({
+          ok: 1,
+          message: "Steppers Done Successfully",
+          status: "200",
+        });
+      } else {
+        return res.json({
+          ok: 0,
+          message: "Internal Error",
+          status: "500",
+        });
+      }
+    } catch (e) {
+      console.log(e.message);
       return res.json({
         ok: 0,
         message: "Internal Error",
         status: "500",
       });
     }
-  } catch (e) {
-    console.log(e.message);
-    return res.json({
-      ok: 0,
-      message: "Internal Error",
-      status: "500",
-    });
   }
-});
+);
 
 module.exports = router;
