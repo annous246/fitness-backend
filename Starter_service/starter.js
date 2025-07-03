@@ -21,7 +21,7 @@ router.post(
     console.log("here");
     try {
       const { age, height, weight, gender } = req.body.analytics;
-      const user = req.body.user;
+      const user = req.user;
       if (!age || !weight || !height) {
         return res.json({
           ok: 0,
