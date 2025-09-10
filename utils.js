@@ -15,7 +15,7 @@ function numberChecker(a) {
 function authenticate(req, res, next) {
   const token = req.header("Authorization")?.split(" ")[1];
   if (!token)
-    return res.json({ status: 400, ok: 0, message: "Session Expired" });
+    return res.json({ status: 400, ok: 0, message: "Session Expired (404)" });
 
   jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
     if (err) {
