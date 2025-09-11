@@ -118,6 +118,14 @@ router.post("/sign-up", AuthLimiter, async (req, res) => {
   }
 });
 
+router.post("/validate", authenticate, AuthLimiter, async (req, res) => {
+  return res.json({
+    status: 200,
+    ok: 1,
+    message: "Valid Token",
+  });
+});
+
 router.post("/sign-in", AuthLimiter, async (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
@@ -155,7 +163,7 @@ router.post("/sign-in", AuthLimiter, async (req, res) => {
       username: user.username,
     },
     process.env.JWT_SECRET,
-    { expiresIn: "10h" }
+    { expiresIn: "7d" }
   );
 
   return res.json({

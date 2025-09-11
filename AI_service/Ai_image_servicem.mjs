@@ -20,20 +20,58 @@ export async function runAi(url) {
     }
 
     const client = ModelClient(endpoint, new AzureKeyCredential(token));
+    let function_definition = [];
+    function_definition.push({
+      type: "function",
+      function: {
+        name: "extract_nutrition_facts",
+        description: "extracts nutrition facts from picture",
+        parameters: {
+          type: "object",
+          properties: {
+            portion: {
+              type: "number",
+              description:
+                "approximate portion side in grams or milliliters (just the number)",
+            },
+            food_name: {
+              type: "string",
+              description: "closest food name (string max 100 caracters)",
+            },
+            protein: {
+              type: "number",
+              description:
+                "approximate protein content in grams inside the whole picture portion (just the number)",
+            },
+            carbs: {
+              type: "number",
+              description:
+                "approximate carbs content in grams inside the whole picture portion (just the number)",
+            },
+            calories: {
+              type: "number",
+              description:
+                "approximate calories content in kilo calories inside the whole picture portion (just the number)",
+            },
+          },
+        },
+      },
+    });
 
     const response = await client.path("/chat/completions").post({
       body: {
         messages: [
           {
             role: "system",
-            content: "You are a helpful assistant that can analyze images",
+            content:
+              "You are a helpful nutrition assistant that can analyze food images",
           },
           {
             role: "user",
             content: [
               {
                 type: "text",
-                text: "Please identify this food (in a max of 15 to 20 characters) and provide nutritional macros and total estimated portion in grams (g), in JSON format: {name:'', protein:'', carbs:'', calories:'', portion:''}.",
+                text: "Please identify this food (in a max of 15 to 20 characters) and provide nutritional macros and total estimated portion in grams (g)",
               },
               {
                 type: "image_url",
@@ -44,7 +82,12 @@ export async function runAi(url) {
             ],
           },
         ],
-        temperature: 1,
+        tools: function_definition,
+        tool_choice: {
+          type: "function",
+          function: { name: "extract_nutrition_facts" },
+        },
+        temperature: 0,
         top_p: 1,
         model: model,
       },
@@ -59,7 +102,13 @@ export async function runAi(url) {
       throw new Error(JSON.stringify(error));
     }
 
-    return response.body.choices[0].message.content;
+    if (response.body.choices[0].finish_reason == "stop") {
+      return response.body.choices[0].message.tool_calls[0].function.arguments;
+    } else {
+      throw new Error("Image Reading Error");
+    }
+
+    //return response.body.choices[0].message.content;
   } catch (error) {
     console.error("Error in runAi:", error.message);
     throw error;
